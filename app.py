@@ -31,4 +31,4 @@ def delete_order(o_id):
     return Order.delete(o_id)
 
 
-app.run(host='0.0.0.0', port=5000)
+app.run(host='0.0.0.0', port=8080)
