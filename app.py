@@ -4,6 +4,8 @@ from db import Base, engine
 from resources.order import Order
 from resources.status import Status
 
+import os
+
 app = Flask(__name__)
 app.config["DEBUG"] = True
 Base.metadata.create_all(engine)

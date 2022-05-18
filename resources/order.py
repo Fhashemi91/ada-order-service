@@ -6,6 +6,7 @@ from constant import STATUS_CREATED
 from daos.order_dao import OrderDAO
 from daos.status_dao import StatusDAO
 from db import Session
+from pubsub import submit_message
 
 
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
@@ -33,6 +34,7 @@ class Order:
         session.commit()
         session.refresh(order)
         session.close()
+        submit_message("order_created", id=str(order.id))
         return jsonify({'order_id': order.id}), 200
 
     @staticmethod
@@ -41,7 +43,8 @@ class Order:
         # https://docs.sqlalchemy.org/en/14/orm/query.html
         # https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_orm_using_query.htm
         order = session.query(OrderDAO).filter(OrderDAO.id == o_id).first()
-
+        
+        submit_message("order info requested", id=str(o_id))
         if order:
             status_obj = order.status
             text_out = {
@@ -62,6 +65,8 @@ class Order:
 
     @staticmethod
     def delete(o_id):
+        submit_message("order delete requested", id=str(o_id))
+
         session = Session()
         effected_rows = session.query(OrderDAO).filter(OrderDAO.id == o_id).delete()
         session.commit()
